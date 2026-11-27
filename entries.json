@@ -1,0 +1,14 @@
+[
+  {
+    "type": "schematics",
+    "cat": "Medieval",
+    "name": "Example castle (delete me)",
+    "builder": "Your name",
+    "version": "1.20.4",
+    "size": "64 x 40 x 64 blocks",
+    "interior": "Yes",
+    "notes": "This is a sample entry so you can see how a card looks. Delete it once you add your own.",
+    "link": "https://example.com/castle",
+    "photos": []
+  }
+]

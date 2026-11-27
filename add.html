@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Add an entry – Minecraft Schematic Center</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap" style="max-width:40rem;padding-bottom:3rem">
+  <h1 style="margin:2rem 0 .5rem">Add an entry</h1>
+  <p class="lede">Fill this in, copy the block it makes, and paste it into <code>data/entries.json</code> on GitHub. See the README for the steps.</p>
+  <label for="type">Section</label><select id="type"><option value="schematics">Schematics</option><option value="resource-packs">Resource packs</option><option value="modpacks">Modpacks</option><option value="data-packs">Data packs</option></select>
+  <label for="cat">Category</label><select id="cat"></select>
+  <label for="name">Name</label><input id="name" maxlength="120">
+  <div class="two"><div><label for="builder">Builder</label><input id="builder" maxlength="80"></div><div><label for="version">Minecraft version</label><input id="version" placeholder="1.20.4"></div></div>
+  <div class="two"><div><label for="size">Size</label><input id="size" placeholder="64 x 40 x 64 blocks"></div><div id="intw"><label for="interior">Interior</label><select id="interior"><option>Yes</option><option>No</option><option>Partly</option></select></div></div>
+  <label for="notes">Description</label><textarea id="notes" rows="3" maxlength="600"></textarea>
+  <label for="photos">Photo file names, separated by commas</label><input id="photos" placeholder="castle-front.jpg, castle-side.jpg, castle-back.jpg">
+  <label><input type="checkbox" id="premium" style="width:auto"> Premium entry</label>
+  <div id="pw" style="display:none"><div class="two"><div><label for="price">Price</label><input id="price" placeholder="$5"></div><div><label for="buy">Buy link (https)</label><input id="buy" placeholder="https://"></div></div></div>
+  <div id="lw"><label for="link">Download link (https)</label><input id="link" placeholder="https://"></div>
+  <div class="acts" style="margin-top:1rem"><button type="button" class="btn main" id="make">Make the block</button><button type="button" class="btn" id="copy">Copy</button></div>
+  <label for="out">Copy this</label><textarea id="out" rows="14" readonly></textarea>
+  <p class="lede" id="msg" role="status"></p>
+</div>
+<script>
+(function(){
+  var PK=['PvP','Build','Old','New','Custom'];
+  var CATS={schematics:['Japan','Medieval','Fantasy','Organic','Farms','Spawns','Greek','Rome','Events','Modern','Stashes','Others'],'resource-packs':PK,modpacks:PK,'data-packs':PK};
+  var $=function(i){return document.getElementById(i)};
+  function sync(){
+    var t=$('type').value,c=$('cat');c.textContent='';
+    CATS[t].forEach(function(x){var o=document.createElement('option');o.textContent=x;c.appendChild(o)});
+    $('intw').style.display=t==='schematics'?'block':'none';
+  }
+  $('type').onchange=sync;sync();
+  $('premium').onchange=function(){var p=this.checked;$('pw').style.display=p?'block':'none';$('lw').style.display=p?'none':'block'};
+  $('make').onclick=function(){
+    var t=$('type').value,o={type:t,cat:$('cat').value,name:$('name').value.trim(),builder:$('builder').value.trim(),version:$('version').value.trim(),size:$('size').value.trim()};
+    if(t==='schematics')o.interior=$('interior').value;
+    if($('notes').value.trim())o.notes=$('notes').value.trim();
+    var ph=$('photos').value.split(',').map(function(s){s=s.trim();return s?(s.indexOf('images/')===0?s:'images/'+s):''}).filter(Boolean);
+    o.photos=ph;
+    if($('premium').checked){o.premium=true;o.price=$('price').value.trim();o.buy=$('buy').value.trim()}
+    else if($('link').value.trim())o.link=$('link').value.trim();
+    if(!o.name){$('msg').textContent='Add a name first.';return}
+    $('out').value=JSON.stringify(o,null,2)+',';
+    $('msg').textContent='Done. Remove the final comma if this is the last entry in the file.';
+  };
+  $('copy').onclick=function(){
+    var out=$('out');out.select();
+    (navigator.clipboard?navigator.clipboard.writeText(out.value):Promise.reject()).then(function(){$('msg').textContent='Copied.'},function(){document.execCommand('copy');$('msg').textContent='Copied.'});
+  };
+})();
+</script>
+</body>
+</html>
